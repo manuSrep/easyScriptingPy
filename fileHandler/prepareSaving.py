@@ -46,7 +46,7 @@ def prepareSaving(filename, path=None, extension=None):
 
     # prepare filename
     if extension is not None:
-        filename = os.path.splitext(filename)
+        filename = os.path.splitext(filename)[0]
         filename += extension
 
     return os.path.join(path, filename)
