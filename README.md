@@ -1,10 +1,15 @@
 # README
 
-This is a light python module which will falcilitate your research work if you often have to write or read lot's of files.
+This is a light python module which will facilitate your (research) work if you often have to do boring stuff like saving or reading lot's of files.
 
-## Library dependencies
 
-To use this module you need the following python modules to be installed:
+## Install
+
+ To install simply type:
+
+ ```
+ pip install easyScripting
+ ```  
 
 
 ## Issues
@@ -12,4 +17,8 @@ Please, feel free to contribute in any way, e.g. in reporting bugs, contributing
 
 You can contact me over Manuel_Tuschen@web.de.
 
+## Version
 
+### 0.1
+
+* Basic file checking for saving and loading tasks.
