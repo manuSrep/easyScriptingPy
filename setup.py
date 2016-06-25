@@ -7,5 +7,5 @@ setup(name='easyScripting',
       author='Manuel Tuschen',
       author_email='Manuel_Tuschen@web.de',
       license='FreeBSD License',
-      packages=['fileHandler'],
+      packages=['easyScripting'],
       zip_safe=False)
