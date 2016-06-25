@@ -35,6 +35,22 @@ from __future__ import division, absolute_import, unicode_literals, print_functi
 import os
 
 def prepareSaving(filename, path=None, extension=None):
+    """
+    Prepare for saving a file, i.e. check if directory exists ... .
+    ----------
+    filename : string
+        The name of the file to load
+    path : string, optional
+        The path where the file is located. If none is given, the current
+        working directory is assumed.
+    extension : string, optional
+        File extension to append at the filename e.g ".png".
+
+    Returns
+    ----------
+    filename : string
+        The full filename including the path and extension.
+    """
 
     # prepare path
     if path is None:
@@ -46,6 +62,8 @@ def prepareSaving(filename, path=None, extension=None):
 
     # prepare filename
     if extension is not None:
+        if extension[0] != '.':
+            extension = '.' + extension
         filename = os.path.splitext(filename)[0]
         filename += extension
 

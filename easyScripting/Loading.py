@@ -36,9 +36,26 @@ import os
 import glob
 
 def prepareLoading(filename, path=None, extension=None):
+    """
+    Prepare for loading a file, i.e. check if it exists ... .
+    ----------
+    filename : string
+        The name of the file to load
+    path : string, optional
+        The path where the file is located. If none is given, the current
+        working directory is assumed.
+    extension : string, optional
+        File extension to append at the filename e.g ".png".
 
+    Returns
+    ----------
+    filename : string
+        The full filename including the path and extension.
+    """
     # prepare filename
     if extension is not None:
+        if extension[0] != '.':
+            extension = '.' + extension
         filename = os.path.splitext(filename)[0]
         filename += extension
 
@@ -51,26 +68,45 @@ def prepareLoading(filename, path=None, extension=None):
     return filename
 
 
-def multiLoading(identifier='*', path=None, extension=None, SUBDIRS=False):
+def multiLoading(identifier='*', directory=None, extension=None, SUBDIRS=False):
+    """
+    Find directories of multiple files.
+    ----------
+    identifier : string
+        Regular expression which must be present in the files to find.
+    directory : string, optional
+        The path where the file is located. If none is given, the current
+        working directory is assumed.
+    extension : string, optional
+        File extension which must be present in the files to find.
 
+    Returns
+    ----------
+    filenames : list
+        A list with all filenames including the path, to look for.
+    """
     # prepare path
-    if path is None:
-        path = os.getcwd()
-    path = os.path.expanduser(path)
+    if directory is None:
+        directory = os.getcwd()
+        directory = os.path.expanduser(directory)
 
-    # eventually including subdirectories
-    if SUBDIRS == True:
-        os.path.join(path,'*')
 
     # add extension if given
     if not extension is None:
         identifier = os.path.splitext(identifier)[0]
         identifier += extension
 
-    # search for all filenames
-    filename = os.path.join(path, identifier)
 
-    filenames = sorted(glob.glob(filename))
+    # eventually including subdirectories
+    if SUBDIRS:
+        filenames = []
+        for root, dirs, files in os.walk(directory, topdown=False):
+            new_files = (glob.glob(os.path.join(root, identifier)))
+            for file in new_files:
+                filenames.append(file)
 
-    return filenames
+    else:
+        filenames = glob.glob(os.path.join(directory, identifier))
+
+    return sorted(filenames)
 
