@@ -13,9 +13,8 @@ This is a light python module which will facilitate your (research) work if you 
 
 
 ## Issues
-Please, feel free to contribute in any way, e.g. in reporting bugs, contributing code or making sugestions for improvements.  
-
-You can contact me over Manuel_Tuschen@web.de.
+Please, feel free to contribute in any way, e.g. in reporting bugs, contributing code or making sugestions for improvements. Preferable use gitHubs "pull requests" but you can also contact me directly:  
+Manuel_Tuschen@web.de.
 
 ## Version
 
