@@ -52,6 +52,9 @@ def prepareLoading(filename, path=None, extension=None):
     filename : string
         The full filename including the path and extension.
     """
+    #prepare path
+    path = os.path.expanduser(path)
+
     # prepare filename
     if extension is not None:
         if extension[0] != '.':
@@ -88,7 +91,7 @@ def multiLoading(identifier='*', directory=None, extension=None, SUBDIRS=False):
     # prepare path
     if directory is None:
         directory = os.getcwd()
-        directory = os.path.expanduser(directory)
+    directory = os.path.expanduser(directory)
 
 
     # add extension if given
