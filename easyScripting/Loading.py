@@ -35,9 +35,16 @@ from __future__ import division, absolute_import, unicode_literals, print_functi
 import os
 import glob
 
+from .Saving import extractFromFilename
+
+
 def prepareLoading(filename, path=None, extension=None):
     """
     Prepare for loading a file, i.e. check if it exists ... .
+    The filename may contain a path and extension but this will be overwritten
+    if either or both are given explicitly.
+
+    Parameters
     ----------
     filename : string
         The name of the file to load
@@ -48,18 +55,30 @@ def prepareLoading(filename, path=None, extension=None):
         File extension to append at the filename e.g ".png".
 
     Returns
-    ----------
+    --------
     filename : string
         The full filename including the path and extension.
     """
-    #prepare path
-    path = os.path.expanduser(path)
 
-    # prepare filename
+    filename, tmpext, tmppath = extractFromFilename(filename)
+
+    # prepare path
+    if path is None and tmppath is None:
+        path = os.getcwd()
+    if path is None and tmppath is not None:
+        path = tmppath
+
+    path = os.path.expanduser(path)
+    if not os.path.exists(path):
+        os.makedirs(path)
+
+    # prepare extension and filename
+    if extension is None and tmpext is not None:
+        extension = tmpext
+
     if extension is not None:
-        if extension[0] != '.':
-            extension = '.' + extension
-        filename = os.path.splitext(filename)[0]
+        extension = extension.lstrip('.')
+        extension = '.' + extension
         filename += extension
 
     filename = os.path.join(path, filename)
@@ -71,45 +90,49 @@ def prepareLoading(filename, path=None, extension=None):
     return filename
 
 
-def multiLoading(identifier='*', directory=None, extension=None, SUBDIRS=False):
+def multiLoading(identifier='*', path=None, extension=None, SUBPATH=False):
     """
     Find directories of multiple files.
+
+    Parameters
     ----------
     identifier : string
         Regular expression which must be present in the files to find.
-    directory : string, optional
+    path : string, optional
         The path where the file is located. If none is given, the current
         working directory is assumed.
     extension : string, optional
         File extension which must be present in the files to find.
+    SUBPATH : bool
+        Search also subdirectories.
 
     Returns
-    ----------
+    --------
     filenames : list
-        A list with all filenames including the path, to look for.
+        A list with all filenames including the path.
     """
     # prepare path
-    if directory is None:
-        directory = os.getcwd()
-    directory = os.path.expanduser(directory)
+    if path is None:
+        path = os.getcwd()
+    path = os.path.expanduser(path)
 
 
     # add extension if given
     if not extension is None:
-        identifier = os.path.splitext(identifier)[0]
+        extension = extension.lstrip('.')
         identifier += extension
 
 
     # eventually including subdirectories
-    if SUBDIRS:
+    if SUBPATH:
         filenames = []
-        for root, dirs, files in os.walk(directory, topdown=False):
+        for root, dirs, files in os.walk(path, topdown=False):
             new_files = (glob.glob(os.path.join(root, identifier)))
             for file in new_files:
                 filenames.append(file)
 
     else:
-        filenames = glob.glob(os.path.join(directory, identifier))
+        filenames = glob.glob(os.path.join(path, identifier))
 
     return sorted(filenames)
 

@@ -34,9 +34,50 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 from __future__ import division, absolute_import, unicode_literals, print_function
 import os
 
+
+def extractFromFilename(filename):
+    """
+    Extract filename, path and extension from filename. If no path or extension
+    is found, None is returned instead of.
+
+    Parameters
+    ----------
+    filename : string
+        The filename to extract from
+
+    Returns
+    -------
+    filename : string
+        The extracted filename
+    extension : string
+        The extracted extension
+    path : string
+        The extracted path or None
+    """
+
+    path, _, fname = filename.rpartition('/')
+
+    if len(path) == 0:
+        path = None
+    else:
+        path = os.path.expanduser(path)
+
+    fname, _, extension = fname.rpartition('.')
+
+    if len(fname) == 0:
+        fname = extension
+        extension = None
+
+    return fname, extension, path
+
+
 def prepareSaving(filename, path=None, extension=None):
     """
     Prepare for saving a file, i.e. check if directory exists ... .
+    The filename may contain a path and extension but this will be overwritten
+    if either or both are given explicitly.
+
+    Parameters
     ----------
     filename : string
         The name of the file to load
@@ -47,24 +88,30 @@ def prepareSaving(filename, path=None, extension=None):
         File extension to append at the filename e.g ".png".
 
     Returns
-    ----------
+    -------
     filename : string
         The full filename including the path and extension.
     """
 
+    filename, tmpext, tmppath = extractFromFilename(filename)
+
     # prepare path
-    if path is None:
+    if path is None and tmppath is None:
         path = os.getcwd()
+    if path is None and tmppath is not None:
+        path = tmppath
+
     path = os.path.expanduser(path)
     if not os.path.exists(path):
         os.makedirs(path)
 
+    # prepare extension and filename
+    if extension is None and tmpext is not None:
+        extension = tmpext
 
-    # prepare filename
     if extension is not None:
-        if extension[0] != '.':
-            extension = '.' + extension
-        filename = os.path.splitext(filename)[0]
+        extension = extension.lstrip('.')
+        extension = '.' + extension
         filename += extension
 
     return os.path.join(path, filename)
