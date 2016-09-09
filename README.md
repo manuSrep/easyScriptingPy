@@ -18,6 +18,8 @@ Manuel_Tuschen@web.de.
 
 ## Version
 
-### 0.1
-
-* Basic file checking for saving and loading tasks.
+#### 0.1
+    * Basic file checking for saving and loading.
+    * Get multiple files for batch loading.
+#### 0.2
+    * Human sortable strings.

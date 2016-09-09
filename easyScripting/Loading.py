@@ -4,7 +4,6 @@
 """
 Functions and classes for easier file handling during loading.
 :author: Manuel Tuschen
-:date: 24.06.2016
 :license: FreeBSD
 
 License

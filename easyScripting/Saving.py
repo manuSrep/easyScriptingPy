@@ -4,7 +4,6 @@
 """
 Functions and classes for easier file handling during saving.
 :author: Manuel Tuschen
-:date: 23.06.2016
 :license: FreeBSD
 
 License
