@@ -34,6 +34,8 @@ from __future__ import division, absolute_import, unicode_literals, print_functi
 import re
 
 
+__all__ = ["hstr"]
+
 
 class hstr(str):
     """
@@ -104,7 +106,7 @@ class hstr(str):
                 return False
 
         # if there is only one element left
-        if len(seq_s) == 1 and len():
+        if len(seq_s) == 1:
             # and those are equal
             try:
                 if int(seq_s[0]) == int(seq_o[0]):
@@ -120,3 +122,6 @@ class hstr(str):
 
     def __ne__(self, other):
         return not self == other
+
+    def __hash__(self):
+        return hash(str(self))

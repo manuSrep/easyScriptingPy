@@ -1,11 +1,12 @@
-from setuptools import setup
+from distutils.core import setup
 
-setup(name='easyScripting',
+
+setup(name='miscpy',
       version='0.2.0',
-      description='easyScripting facilitates (scientific) python scripting. It does so by providing functionality for commonly performed tasks which are anoying to reimplement again and again. Currently there are functions for saving and loading. It also has some String improovments',
+      description='miscpy facilitates (scientific) python scripting. It facilitates file and  data handling through various miscellaneous functions and missing data structures.',
       url='https://github.com/manuSrep/easyScriptingPy.git',
       author='Manuel Tuschen',
       author_email='Manuel_Tuschen@web.de',
       license='FreeBSD License',
-      packages=['easyScripting'],
+      packages=['miscpy'],
       zip_safe=False)

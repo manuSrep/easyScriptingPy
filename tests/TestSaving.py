@@ -1,6 +1,5 @@
 import unittest
 import sys
-import os
 import shutil
 
 sys.path.append("../easyScripting")

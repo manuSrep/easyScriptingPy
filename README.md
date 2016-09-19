@@ -1,6 +1,6 @@
 # README
 
-This is a light python module which will facilitate your (research) work if you often have to do boring stuff like saving or reading lot's of files.
+This is a light python module which will facilitate your (research) work if you often have to do boring stuff like saving or reading lot's of files. In some time there will be also misisng data structures included.
 
 
 ## Install
@@ -8,12 +8,12 @@ This is a light python module which will facilitate your (research) work if you 
  To install simply type:
 
  ```
- pip install easyScripting
+ pip install miscpy
  ```  
 
 
 ## Issues
-Please, feel free to contribute in any way, e.g. in reporting bugs, contributing code or making sugestions for improvements. Preferable use gitHubs "pull requests" but you can also contact me directly:  
+Please, feel free to contribute in any way, e.g. in reporting bugs, contributing code or making suggestion for improvements. Preferable use gitHubs "issue" and "pull requests" but you can also contact me directly:  
 Manuel_Tuschen@web.de.
 
 ## Version

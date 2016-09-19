@@ -2,7 +2,7 @@
 # -*- coding: utf8 -*-
 
 """
-Functions and classes for easier file handling during saving.
+Functions and classes for easier file handling during loading.
 :author: Manuel Tuschen
 :license: FreeBSD
 
@@ -32,47 +32,17 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 from __future__ import division, absolute_import, unicode_literals, print_function
 import os
+import glob
+
+from .Saving import extractFromFilename
 
 
-def extractFromFilename(filename):
+__all__ = ["prepareLoading" , "multiLoading"]
+
+
+def prepareLoading(filename, path=None, extension=None):
     """
-    Extract filename, path and extension from filename. If no path or extension
-    is found, None is returned instead of.
-
-    Parameters
-    ----------
-    filename : string
-        The filename to extract from
-
-    Returns
-    -------
-    filename : string
-        The extracted filename
-    extension : string
-        The extracted extension
-    path : string
-        The extracted path or None
-    """
-
-    path, _, fname = filename.rpartition('/')
-
-    if len(path) == 0:
-        path = None
-    else:
-        path = os.path.expanduser(path)
-
-    fname, _, extension = fname.rpartition('.')
-
-    if len(fname) == 0:
-        fname = extension
-        extension = None
-
-    return fname, extension, path
-
-
-def prepareSaving(filename, path=None, extension=None):
-    """
-    Prepare for saving a file, i.e. check if directory exists ... .
+    Prepare for loading a file, i.e. check if it exists ... .
     The filename may contain a path and extension but this will be overwritten
     if either or both are given explicitly.
 
@@ -87,7 +57,7 @@ def prepareSaving(filename, path=None, extension=None):
         File extension to append at the filename e.g ".png".
 
     Returns
-    -------
+    --------
     filename : string
         The full filename including the path and extension.
     """
@@ -113,5 +83,58 @@ def prepareSaving(filename, path=None, extension=None):
         extension = '.' + extension
         filename += extension
 
-    return os.path.join(path, filename)
+    filename = os.path.join(path, filename)
+
+    # check if file exists
+    if not os.path.isfile(filename):
+        raise IOError('File {f} does not exist'.format(f=filename))
+
+    return filename
+
+
+def multiLoading(identifier='*', path=None, extension=None, SUBPATH=False):
+    """
+    Find directories of multiple files.
+
+    Parameters
+    ----------
+    identifier : string
+        Regular expression which must be present in the files to find.
+    path : string, optional
+        The path where the file is located. If none is given, the current
+        working directory is assumed.
+    extension : string, optional
+        File extension which must be present in the files to find.
+    SUBPATH : bool
+        Search also subdirectories.
+
+    Returns
+    --------
+    filenames : list
+        A list with all filenames including the path.
+    """
+    # prepare path
+    if path is None:
+        path = os.getcwd()
+    path = os.path.expanduser(path)
+
+
+    # add extension if given
+    if not extension is None:
+        extension = extension.lstrip('.')
+        identifier += extension
+
+
+    # eventually including subdirectories
+    if SUBPATH:
+        filenames = []
+        for root, dirs, files in os.walk(path, topdown=False):
+            new_files = (glob.glob(os.path.join(root, identifier)))
+            for file in new_files:
+                filenames.append(file)
+
+    else:
+        filenames = glob.glob(os.path.join(path, identifier))
+
+    return sorted(filenames)
 
