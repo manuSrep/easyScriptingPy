@@ -37,7 +37,7 @@ import glob
 from .Saving import extractFromFilename
 
 
-__all__ = ["prepareLoading" , "multiLoading"]
+__all__ = ["prepareLoading", "multiLoading"]
 
 
 def prepareLoading(filename, path=None, extension=None):

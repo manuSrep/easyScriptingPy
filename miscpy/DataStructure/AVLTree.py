@@ -38,7 +38,7 @@ __all__ = ["avltree"]
 
 
 
-class avtree(bstree):
+class avltree(bstree):
 
     def __init__(self):
         super().__init__()
