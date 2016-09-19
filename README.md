@@ -1,6 +1,6 @@
 # README
 
-This is a light python module which will facilitate your (research) work if you often have to do boring stuff like saving or reading lot's of files. In some time there will be also misisng data structures included.
+This is a light python module which will facilitate your (research) work if you often have to do boring stuff like saving or reading lot's of files. In some time there will be also missing data structures included.
 
 
 ## Install
