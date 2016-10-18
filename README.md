@@ -1,15 +1,25 @@
 # README
-
-This is a light python module which will facilitate your (research) work if you often have to do boring stuff like saving or reading lot's of files. 
+miscpy is a light python module which will facilitate your (research) work if you often have to do boring stuff like saving or reading lot's of files.
 
 
 ## Install
-
  To install simply type:
+    
+   ```
+    pip install miscpy
+   ```  
 
- ```
- pip install miscpy
- ```  
+## Most useful functions
+   ```
+    prepareLoading(filename, path="", extension="") : Create filename for loading.
+    multiLoading(identifier='*', path="", SUBPATH=False) : Load multiple files.
+    prepareSaving(filename, path="", extension="") : Create filename for saving.
+   ```
+  
+## Most useful classe
+   ```
+    hstr : Subclass of str which sorts after intuitive human behaviour.
+   ```
 
 
 ## Issues
