@@ -39,8 +39,8 @@ __all__ = ["hstr"]
 
 class hstr(str):
     """
-    String subclasses which compares after inuitive human behaviour if it
-    contains integers also
+    String subclasses which compares after intuitive human behaviour if it
+    contains integers, too.
     """
 
     def __lt__(self, other):
@@ -54,23 +54,24 @@ class hstr(str):
             seq_o.remove('')
 
         # can we already make a decision?
-        # if both are ints:
-        try:
-            if int(seq_s[0]) < int(seq_o[0]):
-                return True
-        except ValueError:
-            if seq_s[0] < seq_o[0]:
-                return True
-
-        # if there is only one element left in self but more in other
-        if len(seq_s) == 1:
-            # if there are more in other
-            if len(seq_o) > 1:
-                return True
-            else:
-                return False
-        # if there are more elements left
+        # the smaller string always wins
+        if len(seq_s) < len(seq_o):
+            return True
+        elif len(seq_o) < len(seq_s):
+            return False
         else:
+            # if both are ints:
+            try:
+
+                if int(seq_s[0]) < int(seq_o[0]):
+                    return True
+            except ValueError:
+                if seq_s[0] < seq_o[0]:
+                    return True
+            # if one character is left for both
+            if len(seq_s) == 1:
+                return False
+
             return hstr(self.lstrip(seq_s[0])) < hstr(other.lstrip(seq_o[0]))
 
     def __le__(self, other):
@@ -104,7 +105,6 @@ class hstr(str):
             # if not
             if seq_s[0] != seq_o[0]:
                 return False
-
         # if there is only one element left
         if len(seq_s) == 1:
             # and those are equal

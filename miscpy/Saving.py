@@ -40,7 +40,7 @@ __all__ = ["prepareSaving", "extractFromFilename"]
 def extractFromFilename(filename):
     """
     Extract filename, path and extension from filename. If no path or extension
-    is found, None is returned instead of.
+    is found, an empty string is returned instead.
 
     Parameters
     ----------
@@ -50,42 +50,44 @@ def extractFromFilename(filename):
     Returns
     -------
     filename : string
-        The extracted filename
-    extension : string
-        The extracted extension
+        The extracted filename.
     path : string
-        The extracted path or None
+        The extracted path.
+    extension : string
+        The extracted extension.
     """
 
-    path, _, fname = filename.rpartition('/')
-
-    if len(path) == 0:
-        path = None
+    path, name = os.path.split(filename)
+    tmp = name.rsplit('.',1)
+    if len(tmp) == 1:
+        fname = tmp[0]
+        extension = ""
+    elif len(tmp) == 2:
+        fname = tmp[0]
+        extension = tmp[1]
     else:
-        path = os.path.expanduser(path)
-
-    fname, _, extension = fname.rpartition('.')
-
-    if len(fname) == 0:
-        fname = extension
-        extension = None
-
-    return fname, extension, path
+        raise ValueError("Invalid filename {f} can not be split!".format(f=filename))
+    return fname, path, extension
 
 
-def prepareSaving(filename, path=None, extension=None):
+def prepareSaving(filename, path="", extension=""):
     """
-    Prepare for saving a file, i.e. check if directory exists ... .
-    The filename may contain a path and extension but this will be overwritten
-    if either or both are given explicitly.
+    Prepare for saving a file.
+    The filename may already include the path. If "path" is given, the filename
+    must be relative to "path". If no absolute path is set either in the
+    filename with "path", the current working directory is used.  If the path for
+    saving does not exists, it will be created. The filename can also be a path
+    only which will be created in that case.
+    The filename may also contain an extension separated by a '.'. If
+    "extension" is given, this will replace any extension in the filename by
+     searching for the last '.' and replacing the exceeding string.
 
     Parameters
     ----------
     filename : string
         The name of the file to load
     path : string, optional
-        The path where the file is located. If none is given, the current
-        working directory is assumed.
+        The path where the file is located.
     extension : string, optional
         File extension to append at the filename e.g ".png".
 
@@ -93,28 +95,34 @@ def prepareSaving(filename, path=None, extension=None):
     -------
     filename : string
         The full filename including the path and extension.
+
+    Raises
+    ------
+    IO Error :
+        If file already exists.
     """
 
-    filename, tmpext, tmppath = extractFromFilename(filename)
+
+    fname, tmp_path, tmp_ext = extractFromFilename(filename)
 
     # prepare path
-    if path is None and tmppath is None:
-        path = os.getcwd()
-    if path is None and tmppath is not None:
-        path = tmppath
-
-    path = os.path.expanduser(path)
+    path = os.path.join(path, tmp_path)
+    path = os.path.normcase(path)
+    path = os.path.normpath(path)
+    path = os.path.abspath(os.path.expanduser(path))
     if not os.path.exists(path):
         os.makedirs(path)
-
-    # prepare extension and filename
-    if extension is None and tmpext is not None:
-        extension = tmpext
-
-    if extension is not None:
+    # prepare extension
+    if len(fname) == 0:
+        extension = ""
+    elif len(extension) > 0:
         extension = extension.lstrip('.')
         extension = '.' + extension
-        filename += extension
+    elif len(tmp_ext) > 0:
+        extension = tmp_ext.lstrip('.')
+        extension = '.' + extension
+    else:
+        extension = ""
 
-    return os.path.join(path, filename)
+    return os.path.join(path, fname+extension)
 

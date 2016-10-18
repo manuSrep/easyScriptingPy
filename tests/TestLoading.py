@@ -3,66 +3,105 @@ import sys
 import os
 import shutil
 
-sys.path.append("../easyScripting")
-from Loading import prepareLoading, multiLoading
+sys.path.append("../miscpy/")
+from miscpy import prepareLoading, multiLoading
 
 
-
-class TestPrepareLoading(unittest.TestCase):
+class TestPrepareSaving(unittest.TestCase):
 
     def setUp(self):
-        self.test_path = "path/"
-        self.test_name = "name"
-        self.test_extension = ".tst"
-        os.makedirs(self.test_path)
-        open(self.test_path+self.test_name+self.test_extension, 'w+')
+        if not os.path.exists("delete_me"):
+            os.makedirs("delete_me/")
 
-    def test_extension(self):
-        extension = ".tst"
-        print(prepareLoading(self.test_name,self.test_path,extension))
 
-    def test_dot_extension(self):
-        extension = ".tst"
-        print(prepareLoading(self.test_name,self.test_path,extension))
+    def test_filename_from_name_path_and_extension(self):
+        test_name = ["file"]
+        test_path = ["path", "path/path", "path//path"]
+        test_ext = ["ext", ".ext"]
+        for name in test_name:
+            for path in test_path:
+                for ext in test_ext:
+                    control = os.path.abspath(os.path.join("delete_me", os.path.join(path, "{n}.ext".format(n=name))))
+                    if not os.path.exists(os.path.dirname(control)):
+                        os.makedirs(os.path.dirname(control))
+                    open(control,'a').close()
+                    new = prepareLoading(name, os.path.join("delete_me", path), ext)
+                    self.assertEqual(control, new)
 
-    def test_complex_path(self):
-        try:
-            path = self.test_path + "/path_sub/"
-            extension = ".tst"
-            print(prepareLoading(self.test_name, path, extension))
-        except IOError:
-            print ('IOError successful')
+    def test_filename_from_name_including_path_and_extension(self):
+        test_name = ["path/file.ext"]
+        test_path = ["path", "path/path", "path//path"]
+        for name in test_name:
+            for path in test_path:
+                control = os.path.abspath(os.path.join("delete_me", os.path.join(path, "{n}".format(n=name))))
+                if not os.path.exists(os.path.dirname(control)):
+                    os.makedirs(os.path.dirname(control))
+                open(control, 'a').close()
+                new = prepareLoading(name, os.path.join("delete_me", path))
+                self.assertEqual(control, new)
+                self.assertTrue(os.path.exists(os.path.abspath(os.path.join("delete_me", path+"/path/"))))
+
+    def test_filename_from_name_overwriting_extension(self):
+        test_name = ["file.foo"]
+        test_path = ["path", "path/path", "path//path"]
+        test_ext = ["ext",  ".ext"]
+        for name in test_name:
+            for path in test_path:
+                for ext in test_ext:
+                    control = os.path.abspath(os.path.join("delete_me", os.path.join(path, "file.ext")))
+                    if not os.path.exists(os.path.dirname(control)):
+                        os.makedirs(os.path.dirname(control))
+                    open(control, 'a').close()
+                    new = prepareLoading(name, os.path.join("delete_me", path), ext)
+                    self.assertEqual(control, new)
+                    self.assertTrue(os.path.exists(os.path.abspath(os.path.join("delete_me", path))))
+
+    def test_filename_not_existing(self):
+        test_name = ["foo.bar"]
+        for name in test_name:
+            self.assertRaises(IOError, prepareLoading, name)
+
 
     def doCleanups(self):
-        shutil.rmtree(self.test_path)
+        shutil.rmtree("delete_me/")
 
 
 class TestMultiLoading(unittest.TestCase):
 
-    def setUp(self):
-        self.test_subpath = "sub_path/"
-        self.test_path = "path/"
-        self.test_name = "name"
-        self.test_extension = ".tst"
-        os.makedirs(self.test_path+self.test_subpath)
-        for i in range(10):
-            open(self.test_path+self.test_name+"_{i}".format(i=i)+self.test_extension, 'w+')
-            open(self.test_path+self.test_name+"_{i}".format(i=i)+".png", 'w+')
-            open(self.test_path+ self.test_subpath+self.test_name + "_{i}".format(
-                i=i) + self.test_extension, 'w+')
+    def test_excluding_subdir(self):
+        test_files = ["file_test_1.tst", "path/file_test_2.tst", "file_test_3.txt", "file_tet_4.tst"]
+        expected_files = ["file_test_1.tst"]
 
-    def test_with_subdir(self):
-        print(multiLoading(directory=self.test_path, SUBDIRS=True, extension=self.test_extension))
+        for file in test_files:
+            file = os.path.join("delete_me/", file)
+            if not os.path.exists(os.path.dirname(file)):
+                os.makedirs(os.path.dirname(file))
+            open(file, 'a').close()
 
-    def test_without_subdir(self):
-        print(multiLoading(directory=self.test_path, SUBDIRS=False, extension=self.test_extension))
+        for i in range(len(expected_files)):
+            expected_files[i] = os.path.abspath(os.path.expanduser(os.path.join("delete_me", expected_files[i])))
+        self.assertEqual(expected_files, multiLoading("*_test_*.tst", "delete_me", SUBPATH=False))
 
-    def test_include_all(self):
-        print(multiLoading(directory=self.test_path, SUBDIRS=False))
+    def test_including_subdir(self):
+        test_files = ["file_test_1.tst", "path/file_test_2.tst",
+                      "file_test_3.txt", "file_tet_4.tst"]
+        expected_files = ["file_test_1.tst", "path/file_test_2.tst"]
 
+        for file in test_files:
+            file = os.path.join("delete_me/", file)
+            if not os.path.exists(os.path.dirname(file)):
+                os.makedirs(os.path.dirname(file))
+            open(file, 'a').close()
+
+        for i in range(len(expected_files)):
+            expected_files[i] = os.path.abspath(os.path.expanduser(
+                os.path.join("delete_me", expected_files[i])))
+        self.assertEqual(expected_files, multiLoading("*_test_*.tst", "delete_me", SUBPATH=True))
 
     def doCleanups(self):
-        shutil.rmtree(self.test_path)
+        shutil.rmtree("delete_me/")
+
+
 
 if __name__ == '__main__':
     unittest.main()

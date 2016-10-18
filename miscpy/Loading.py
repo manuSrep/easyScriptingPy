@@ -40,11 +40,16 @@ from .Saving import extractFromFilename
 __all__ = ["prepareLoading", "multiLoading"]
 
 
-def prepareLoading(filename, path=None, extension=None):
+def prepareLoading(filename, path="", extension=""):
     """
-    Prepare for loading a file, i.e. check if it exists ... .
-    The filename may contain a path and extension but this will be overwritten
-    if either or both are given explicitly.
+    Prepare for loading a file.
+    The filename may already include the path. If "path" is given, the filename
+    must be relative to "path". If no absolute path is set either in the
+    filename with "path", the current working directory is used.
+    The filename may also contain an extension separated by a '.'. If
+    "extension" is given, this will replace any extension in the filename by
+     searching for the last '.' and replacing the exceeding string.
+    If the file to load does not exists, an IOError is thrown.
 
     Parameters
     ----------
@@ -60,31 +65,35 @@ def prepareLoading(filename, path=None, extension=None):
     --------
     filename : string
         The full filename including the path and extension.
+
+    Raises
+    ------
+    IOError :
+        If file to load does not exists.
     """
 
-    filename, tmpext, tmppath = extractFromFilename(filename)
+    fname, tmp_path, tmp_ext = extractFromFilename(filename)
 
     # prepare path
-    if path is None and tmppath is None:
-        path = os.getcwd()
-    if path is None and tmppath is not None:
-        path = tmppath
-
-    path = os.path.expanduser(path)
+    path = os.path.join(path, tmp_path)
+    path = os.path.normcase(path)
+    path = os.path.normpath(path)
+    path = os.path.abspath(os.path.expanduser(path))
     if not os.path.exists(path):
         os.makedirs(path)
-
-    # prepare extension and filename
-    if extension is None and tmpext is not None:
-        extension = tmpext
-
-    if extension is not None:
+    # prepare extension
+    if len(fname) == 0:
+        extension = ""
+    elif len(extension) > 0:
         extension = extension.lstrip('.')
         extension = '.' + extension
-        filename += extension
+    elif len(tmp_ext) > 0:
+        extension = tmp_ext.lstrip('.')
+        extension = '.' + extension
+    else:
+        extension = ""
 
-    filename = os.path.join(path, filename)
-
+    filename = os.path.join(path, fname + extension)
     # check if file exists
     if not os.path.isfile(filename):
         raise IOError('File {f} does not exist'.format(f=filename))
@@ -92,19 +101,18 @@ def prepareLoading(filename, path=None, extension=None):
     return filename
 
 
-def multiLoading(identifier='*', path=None, extension=None, SUBPATH=False):
+def multiLoading(identifier='*', path="", SUBPATH=False):
     """
     Find directories of multiple files.
 
     Parameters
     ----------
     identifier : string
-        Regular expression which must be present in the files to find.
+        String which might contain shell like wildcars to identify the files to
+        load.
     path : string, optional
         The path where the file is located. If none is given, the current
         working directory is assumed.
-    extension : string, optional
-        File extension which must be present in the files to find.
     SUBPATH : bool
         Search also subdirectories.
 
@@ -113,17 +121,13 @@ def multiLoading(identifier='*', path=None, extension=None, SUBPATH=False):
     filenames : list
         A list with all filenames including the path.
     """
+
     # prepare path
-    if path is None:
+    if len(path) == 0:
         path = os.getcwd()
-    path = os.path.expanduser(path)
-
-
-    # add extension if given
-    if not extension is None:
-        extension = extension.lstrip('.')
-        identifier += extension
-
+    path = os.path.normcase(path)
+    path = os.path.normpath(path)
+    path = os.path.abspath(os.path.expanduser(path))
 
     # eventually including subdirectories
     if SUBPATH:
@@ -132,7 +136,6 @@ def multiLoading(identifier='*', path=None, extension=None, SUBPATH=False):
             new_files = (glob.glob(os.path.join(root, identifier)))
             for file in new_files:
                 filenames.append(file)
-
     else:
         filenames = glob.glob(os.path.join(path, identifier))
 
